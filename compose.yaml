@@ -1,0 +1,73 @@
+services:
+  frontend:
+    image: leo4485/frontmain:${FRONTMAIN}
+    container_name: frontend
+    stdin_open: true
+    ports:
+      - 4000:4000
+    restart: always
+    depends_on:
+      - backauth
+      - traefik
+    expose:
+      - 4000
+    labels:
+      - "traefik.http.routers.frontend.rule=Host(`app.localhost`) && PathPrefix(`/`)"
+      - "traefik.http.routers.frontend.service=frontend"
+      - "traefik.http.services.frontend.loadbalancer.server.port=4000"
+
+
+  backauth:
+    restart: always
+    image: leo4485/backauth:${BACKAUTH}
+    container_name: backauth
+    depends_on:
+      - mongo
+      - traefik
+    ports:
+      - "3000:3000"
+    expose: 
+      - 3000
+    environment:
+      - NODE_ENV_PROFILE=production
+    labels:
+      - "traefik.http.routers.backauth.rule=Host(`app.localhost`) && PathPrefix(`/api`)" # Définir la règle de routage pour l'API
+      - "traefik.http.services.backauth.loadbalancer.server.port=3000" # Définir le port du service
+
+  mongo:
+    restart: always
+    image: mongo:${MONGO}
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data:/data/db
+    expose:
+      - 27017
+    depends_on:
+      - traefik   
+    
+  mysql:
+    image: mysql:${MYSQL}
+    container_name: mysql
+    command: --skip-initialize-insecure
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3306:3306"
+    expose:
+      - 3306
+
+  traefik:
+    image: traefik:${TRAEFIK}
+    container_name: traefik
+    command:
+      - --api.insecure=true
+      - --providers.docker=true
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  
