@@ -1,6 +1,6 @@
 services:
-  frontend:
-    image: ${NOM_REPO_DOCKERHUB}/frontmain:${FRONTMAIN_VERSION}
+  elective-web-front:
+    image: ${NOM_REPO_DOCKERHUB}/${FRONT_MAIN_NAME}:${FRONT_MAIN_VERSION}
     container_name: frontend
     stdin_open: true
     ports:
@@ -8,18 +8,19 @@ services:
     restart: always
     depends_on:
       - elective-web-auth
+      - elective-web-restauration
       - traefik
     expose:
       - 4000
     labels:
-      - "traefik.http.routers.frontend.rule=Host(`app.localhost`) && PathPrefix(`/`)"
-      - "traefik.http.routers.frontend.service=frontend"
-      - "traefik.http.services.frontend.loadbalancer.server.port=4000"
+      - "traefik.http.routers.elective-web-front.rule=Host(`app.localhost`) && PathPrefix(`/`)"
+      - "traefik.http.routers.elective-web-front.service=elective-web-front"
+      - "traefik.http.services.elective-web-front.loadbalancer.server.port=4000"
 
 
   elective-web-auth:
     restart: always
-    image: ${NOM_REPO_DOCKERHUB}/${BACKAUTH_NAME}:${BACKAUTH_VERSION}
+    image: ${NOM_REPO_DOCKERHUB}/${BACK_AUTH_NAME}:${BACK_AUTH_VERSION}
     container_name: elective-web-auth
     depends_on:
       - mongo
@@ -30,9 +31,28 @@ services:
       - 3000
     environment:
       - NODE_ENV_PROFILE=production
+      - NODE_ENV_PREFIX=${BACK_AUTH_PREFIX}
     labels:
-      - "traefik.http.routers.elective-web-auth.rule=Host(`app.localhost`) && PathPrefix(`/api`)" # Définir la règle de routage pour l'API
+      - "traefik.http.routers.elective-web-auth.rule=Host(`app.localhost`) && PathPrefix(`${BACK_AUTH_PREFIX}`)" # Définir la règle de routage pour l'API
       - "traefik.http.services.elective-web-auth.loadbalancer.server.port=3000" # Définir le port du service
+
+  elective-web-restauration:
+      restart: always
+      image: ${NOM_REPO_DOCKERHUB}/${BACK_RESTAURATION_NAME}:${BACK_RESTAURATION_VERSION}
+      container_name: elective-web-restauration
+      depends_on:
+        - mongo
+        - traefik
+      ports:
+        - "3001:3001"
+      expose: 
+        - 3001
+      environment:
+        - NODE_ENV_PROFILE=production
+        - NODE_ENV_PREFIX=${BACK_RESTAURATION_PREFIX}
+      labels:
+        - "traefik.http.routers.elective-web-restauration.rule=Host(`app.localhost`) && PathPrefix(`${BACK_RESTAURATION_PREFIX}`)" # Définir la règle de routage pour l'API
+        - "traefik.http.services.elective-web-restauration.loadbalancer.server.port=3001" # Définir le port du service
 
   mongo:
     restart: always
