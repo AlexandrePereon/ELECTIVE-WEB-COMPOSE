@@ -76,7 +76,8 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./sql_data/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./mysql_script/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./sql_data:/var/lib/mysql
     expose:
       - 3306
 
