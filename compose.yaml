@@ -4,7 +4,7 @@ services:
     container_name: frontend
     stdin_open: true
     ports:
-      - 4000:4000
+      - "4000"
     restart: always
     depends_on:
       - elective-web-auth
@@ -26,7 +26,7 @@ services:
       - mongo
       - traefik
     ports:
-      - "3000:3000"
+      - "3000"
     expose: 
       - 3000
     environment:
@@ -39,12 +39,11 @@ services:
   elective-web-restauration:
       restart: always
       image: ${NOM_REPO_DOCKERHUB}/${BACK_RESTAURATION_NAME}:${BACK_RESTAURATION_VERSION}
-      container_name: elective-web-restauration
       depends_on:
         - mongo
         - traefik
       ports:
-        - "3001:3001"
+        - "3001"
       expose: 
         - 3001
       environment:
