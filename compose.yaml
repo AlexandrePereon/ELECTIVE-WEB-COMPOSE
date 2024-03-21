@@ -25,6 +25,7 @@ services:
     depends_on:
       - mongo
       - traefik
+      - mysql
     ports:
       - "3000"
     expose: 
@@ -60,7 +61,7 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - ./data:/data/db
+      - ./mongodb_data:/data/db
     expose:
       - 27017
     depends_on:
@@ -69,11 +70,13 @@ services:
   mysql:
     image: mysql:${MYSQL_VERSION}
     container_name: mysql
-    command: --skip-initialize-insecure
+    command: --init-file /docker-entrypoint-initdb.d/init.sql
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     ports:
       - "3306:3306"
+    volumes:
+      - ./sql_data/init.sql:/docker-entrypoint-initdb.d/init.sql
     expose:
       - 3306
 
