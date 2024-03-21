@@ -53,6 +53,7 @@ services:
       labels:
         - "traefik.http.routers.elective-web-restauration.rule=Host(`app.localhost`) && PathPrefix(`${BACK_RESTAURATION_PREFIX}`)" # Définir la règle de routage pour l'API
         - "traefik.http.services.elective-web-restauration.loadbalancer.server.port=3001" # Définir le port du service
+        - "traefik.http.routers.elective-web-restauration.middlewares=my-auth-middleware" # Ajouter le middleware d'authentification
 
   mongo:
     restart: always
@@ -92,5 +93,9 @@ services:
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - "traefik.http.middlewares.my-auth-middleware.forwardauth.address=http://elective-web-auth:3000/auth/verify" # Définir l'adresse de l'API d'authentification
+      - "traefik.http.middlewares.my-auth-middleware.forwardauth.authResponseHeaders=X-User" # Définir le header à ajouter à la requête
+      - "traefik.http.middlewares.my-auth-middleware.forwardauth.trustForwardHeader=true" # Si vous faites confiance au header X-Forwarded-For
 
   
