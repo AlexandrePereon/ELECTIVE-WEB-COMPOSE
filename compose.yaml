@@ -62,7 +62,7 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - ./mongodb_data:/data/db
+      - ./data/mongodb_data:/data/db
     expose:
       - 27017
     depends_on:
@@ -78,7 +78,7 @@ services:
       - "3306:3306"
     volumes:
       - ./mysql_script/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./mysql_data:/var/lib/mysql
+      - ./data/mysql_data:/var/lib/mysql
     expose:
       - 3306
 
@@ -113,7 +113,7 @@ services:
     ports:
       - 3010:3000
     volumes:
-      - ./grafana_data:/var/lib/grafana
+      - ./data/grafana_data:/var/lib/grafana
       - ./metrics/prometheus-datasource.yaml:/etc/grafana/provisioning/datasources/prometheus-datasource.yaml
       - ./metrics/dashboards:/etc/grafana/provisioning/dashboards
     environment:
