@@ -88,6 +88,7 @@ services:
     command:
       - --api.insecure=true
       - --providers.docker=true
+      - --metrics.prometheus=true
     ports:
       - "80:80"
       - "8080:8080"
@@ -98,4 +99,23 @@ services:
       - "traefik.http.middlewares.auth-middleware.forwardauth.authResponseHeaders=X-User" # Définir le header à ajouter à la requête
       - "traefik.http.middlewares.auth-middleware.forwardauth.trustForwardHeader=true" # Si vous faites confiance au header X-Forwarded-For
 
-  
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./metrics/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - 9090:9090
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3010:3000
+    volumes:
+      - ./grafana_data:/var/lib/grafana
+      - ./metrics/prometheus-datasource.yaml:/etc/grafana/provisioning/datasources/prometheus-datasource.yaml
+      - ./metrics/dashboards:/etc/grafana/provisioning/dashboards
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
