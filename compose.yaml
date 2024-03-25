@@ -4,18 +4,17 @@ services:
     container_name: frontend
     stdin_open: true
     ports:
-      - "4000"
+      - ${FRONT_MAIN_PORT}
     restart: always
     depends_on:
       - elective-web-auth
       - elective-web-restauration
       - traefik
     expose:
-      - 4000
+      - ${FRONT_MAIN_PORT}
     labels:
       - "traefik.http.routers.elective-web-front.rule=Host(`app.localhost`) && PathPrefix(`/`)"
-      - "traefik.http.routers.elective-web-front.service=elective-web-front"
-      - "traefik.http.services.elective-web-front.loadbalancer.server.port=4000"
+      - "traefik.http.services.elective-web-front.loadbalancer.server.port=${FRONT_MAIN_PORT}"
 
 
   elective-web-auth:
@@ -27,15 +26,15 @@ services:
       - traefik
       - mysql
     ports:
-      - "3000"
+      - ${BACK_AUTH_PORT}
     expose: 
-      - 3000
+      - ${BACK_AUTH_PORT}
     environment:
       - NODE_ENV_PROFILE=production
       - NODE_ENV_PREFIX=${BACK_AUTH_PREFIX}
     labels:
       - "traefik.http.routers.elective-web-auth.rule=Host(`app.localhost`) && PathPrefix(`${BACK_AUTH_PREFIX}`)" # Définir la règle de routage pour l'API
-      - "traefik.http.services.elective-web-auth.loadbalancer.server.port=3000" # Définir le port du service
+      - "traefik.http.services.elective-web-auth.loadbalancer.server.port=${BACK_AUTH_PORT}" # Définir le port du service
 
   elective-web-restauration:
       restart: always
@@ -44,15 +43,15 @@ services:
         - mongo
         - traefik
       ports:
-        - "3001"
+        - ${BACK_RESTAURATION_PORT}
       expose: 
-        - 3001
+        - ${BACK_RESTAURATION_PORT}
       environment:
         - NODE_ENV_PROFILE=production
         - NODE_ENV_PREFIX=${BACK_RESTAURATION_PREFIX}
       labels:
         - "traefik.http.routers.elective-web-restauration.rule=Host(`app.localhost`) && PathPrefix(`${BACK_RESTAURATION_PREFIX}`)" # Définir la règle de routage pour l'API
-        - "traefik.http.services.elective-web-restauration.loadbalancer.server.port=3001" # Définir le port du service
+        - "traefik.http.services.elective-web-restauration.loadbalancer.server.port=${BACK_RESTAURATION_PORT}" # Définir le port du service
         - "traefik.http.routers.elective-web-restauration.middlewares=auth-middleware" # Ajouter le middleware d'authentification
 
   mongo:
@@ -60,11 +59,11 @@ services:
     image: mongo:${MONGO_VERSION}
     container_name: mongo
     ports:
-      - "27017:27017"
+      - "${MONGO_DB_PORT}:${MONGO_DB_PORT}"
     volumes:
       - ./data/mongodb_data:/data/db
     expose:
-      - 27017
+      - ${MONGO_DB_PORT}
     depends_on:
       - traefik   
     
@@ -75,12 +74,12 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     ports:
-      - "3306:3306"
+      - "${MY_SQL_PORT}:${MY_SQL_PORT}"
     volumes:
       - ./mysql_script/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./data/mysql_data:/var/lib/mysql
     expose:
-      - 3306
+      - ${MY_SQL_PORT}
 
   traefik:
     image: traefik:${TRAEFIK_VERSION}
@@ -98,7 +97,7 @@ services:
       - "traefik.http.middlewares.auth-middleware.forwardauth.address=http://elective-web-auth:3000${BACK_AUTH_PREFIX}/verify" # Définir l'adresse de l'API d'authentification
       - "traefik.http.middlewares.auth-middleware.forwardauth.authResponseHeaders=X-User" # Définir le header à ajouter à la requête
       - "traefik.http.middlewares.auth-middleware.forwardauth.trustForwardHeader=true" # Si vous faites confiance au header X-Forwarded-For
-
+  
   prometheus:
     image: prom/prometheus
     volumes:
@@ -111,11 +110,18 @@ services:
   grafana:
     image: grafana/grafana
     ports:
-      - 3010:3000
+      - ${GRAFANA_PORT}
     volumes:
       - ./data/grafana_data:/var/lib/grafana
       - ./metrics/prometheus-datasource.yaml:/etc/grafana/provisioning/datasources/prometheus-datasource.yaml
       - ./metrics/dashboards:/etc/grafana/provisioning/dashboards
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}   
+      - GF_SERVER_HTTP_PORT=${GRAFANA_PORT} 
+      - GF_SERVER_ROOT_URL=${GRAFANA_PREFIX}
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+    labels:
+    - "traefik.http.routers.grafana.rule=Host(`app.localhost`) && PathPrefix(`${GRAFANA_PREFIX}`)" 
+    - "traefik.http.services.grafana.loadbalancer.server.port=${GRAFANA_PORT}" 
+
