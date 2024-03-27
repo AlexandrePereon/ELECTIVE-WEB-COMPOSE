@@ -9,6 +9,7 @@ services:
     depends_on:
       - elective-web-auth
       - elective-web-restauration
+      - elective-web-order
       - traefik
     expose:
       - ${FRONT_MAIN_PORT}
@@ -53,6 +54,24 @@ services:
       - "traefik.http.routers.elective-web-restauration.rule=Host(`${BASE_URL}`) && PathPrefix(`${BACK_RESTAURATION_PREFIX}`)" # Définir la règle de routage pour l'API
       - "traefik.http.services.elective-web-restauration.loadbalancer.server.port=${BACK_RESTAURATION_PORT}" # Définir le port du service
       - "traefik.http.routers.elective-web-restauration.middlewares=auth-middleware" # Ajouter le middleware d'authentification
+
+  elective-web-order:
+    restart: always
+    image: ${NOM_REPO_DOCKERHUB}/${BACK_ORDER_NAME}:${BACK_ORDER_VERSION}
+    depends_on:
+      - mongo
+      - traefik
+    ports:
+      - ${BACK_ORDER_PORT}
+    expose: 
+      - ${BACK_ORDER_PORT}
+    environment:
+      - NODE_ENV_PROFILE=production
+      - NODE_ENV_PREFIX=${BACK_ORDER_PREFIX}
+    labels:
+      - "traefik.http.routers.elective-web-order.rule=Host(`${BASE_URL}`) && PathPrefix(`${BACK_ORDER_PREFIX}`)" # Définir la règle de routage pour l'API
+      - "traefik.http.services.elective-web-order.loadbalancer.server.port=${BACK_ORDER_PORT}" # Définir le port du service
+      - "traefik.http.routers.elective-web-order.middlewares=auth-middleware" # Ajouter le middleware d'authentification
 
   mongo:
     restart: always
@@ -124,6 +143,7 @@ services:
     labels:
       - "traefik.http.routers.grafana.rule=Host(`${BASE_URL}`) && PathPrefix(`${GRAFANA_PREFIX}`)" 
       - "traefik.http.services.grafana.loadbalancer.server.port=${GRAFANA_PORT}"
+
 # gitlab:
 #   image: gitlab/gitlab-ee:${GITLAB_VERSION}
 #   container_name: gitlab
