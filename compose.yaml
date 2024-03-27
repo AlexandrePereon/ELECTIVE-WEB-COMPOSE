@@ -13,7 +13,7 @@ services:
     expose:
       - ${FRONT_MAIN_PORT}
     labels:
-      - "traefik.http.routers.elective-web-front.rule=Host(`app.localhost`) && PathPrefix(`/`)"
+      - "traefik.http.routers.elective-web-front.rule=Host(`${BASE_URL}`) && PathPrefix(`/`)"
       - "traefik.http.services.elective-web-front.loadbalancer.server.port=${FRONT_MAIN_PORT}"
 
 
@@ -33,26 +33,26 @@ services:
       - NODE_ENV_PROFILE=production
       - NODE_ENV_PREFIX=${BACK_AUTH_PREFIX}
     labels:
-      - "traefik.http.routers.elective-web-auth.rule=Host(`app.localhost`) && PathPrefix(`${BACK_AUTH_PREFIX}`)" # Définir la règle de routage pour l'API
+      - "traefik.http.routers.elective-web-auth.rule=Host(`${BASE_URL}`) && PathPrefix(`${BACK_AUTH_PREFIX}`)" # Définir la règle de routage pour l'API
       - "traefik.http.services.elective-web-auth.loadbalancer.server.port=${BACK_AUTH_PORT}" # Définir le port du service
 
   elective-web-restauration:
-      restart: always
-      image: ${NOM_REPO_DOCKERHUB}/${BACK_RESTAURATION_NAME}:${BACK_RESTAURATION_VERSION}
-      depends_on:
-        - mongo
-        - traefik
-      ports:
-        - ${BACK_RESTAURATION_PORT}
-      expose: 
-        - ${BACK_RESTAURATION_PORT}
-      environment:
-        - NODE_ENV_PROFILE=production
-        - NODE_ENV_PREFIX=${BACK_RESTAURATION_PREFIX}
-      labels:
-        - "traefik.http.routers.elective-web-restauration.rule=Host(`app.localhost`) && PathPrefix(`${BACK_RESTAURATION_PREFIX}`)" # Définir la règle de routage pour l'API
-        - "traefik.http.services.elective-web-restauration.loadbalancer.server.port=${BACK_RESTAURATION_PORT}" # Définir le port du service
-        - "traefik.http.routers.elective-web-restauration.middlewares=auth-middleware" # Ajouter le middleware d'authentification
+    restart: always
+    image: ${NOM_REPO_DOCKERHUB}/${BACK_RESTAURATION_NAME}:${BACK_RESTAURATION_VERSION}
+    depends_on:
+      - mongo
+      - traefik
+    ports:
+      - ${BACK_RESTAURATION_PORT}
+    expose: 
+      - ${BACK_RESTAURATION_PORT}
+    environment:
+      - NODE_ENV_PROFILE=production
+      - NODE_ENV_PREFIX=${BACK_RESTAURATION_PREFIX}
+    labels:
+      - "traefik.http.routers.elective-web-restauration.rule=Host(`${BASE_URL}`) && PathPrefix(`${BACK_RESTAURATION_PREFIX}`)" # Définir la règle de routage pour l'API
+      - "traefik.http.services.elective-web-restauration.loadbalancer.server.port=${BACK_RESTAURATION_PORT}" # Définir le port du service
+      - "traefik.http.routers.elective-web-restauration.middlewares=auth-middleware" # Ajouter le middleware d'authentification
 
   mongo:
     restart: always
@@ -122,6 +122,28 @@ services:
       - GF_SERVER_ROOT_URL=${GRAFANA_PREFIX}
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
     labels:
-    - "traefik.http.routers.grafana.rule=Host(`app.localhost`) && PathPrefix(`${GRAFANA_PREFIX}`)" 
-    - "traefik.http.services.grafana.loadbalancer.server.port=${GRAFANA_PORT}" 
+      - "traefik.http.routers.grafana.rule=Host(`${BASE_URL}`) && PathPrefix(`${GRAFANA_PREFIX}`)" 
+      - "traefik.http.services.grafana.loadbalancer.server.port=${GRAFANA_PORT}"
+# gitlab:
+#   image: gitlab/gitlab-ee:${GITLAB_VERSION}
+#   container_name: gitlab
+#   restart: always
+#   environment:
+#     GITLAB_OMNIBUS_CONFIG: |
+#       gitlab_rails['initial_root_password'] = "ComplexPassword123"
+#       gitlab_rails['store_initial_root_password'] = true
+#       external_url 'http://${BASE_URL}${GITLAB_PREFIX}'
+#
+#   ports:
+#     - ${GITLAB_PORT}:80
+#   volumes:
+#     - './data/gitlab/config:/etc/gitlab'
+#     - './data/gitlab/logs:/var/log/gitlab'
+#     - './data/gitlab/data:/var/opt/gitlab'
+#   shm_size: '256m'
+#   labels:
+#   - "traefik.http.routers.gitlab.rule=Host(`${BASE_URL}`) && PathPrefix(`${GITLAB_PREFIX}`)" 
+#   - "traefik.http.services.gitlab.loadbalancer.server.port=80"
+#   - "traefik.http.routers.gitlab.entrypoints=http"
 
+    
