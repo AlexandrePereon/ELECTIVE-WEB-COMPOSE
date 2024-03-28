@@ -1,21 +1,21 @@
 services:
   elective-web-front:
     image: ${NOM_REPO_DOCKERHUB}/${FRONT_MAIN_NAME}:${FRONT_MAIN_VERSION}
-    container_name: frontend
+    container_name: ${FRONT_MAIN_NAME}
     stdin_open: true
     ports:
       - ${FRONT_MAIN_PORT}
     restart: always
     depends_on:
-      - elective-web-auth
-      - elective-web-restauration
-      - elective-web-order
+      - ${BACK_AUTH_NAME}
+      - ${BACK_RESTAURATION_NAME}
+      - ${BACK_ORDER_NAME}
       - traefik
     expose:
       - ${FRONT_MAIN_PORT}
     labels:
-      - "traefik.http.routers.elective-web-front.rule=Host(`${BASE_URL}`) && PathPrefix(`/`)"
-      - "traefik.http.services.elective-web-front.loadbalancer.server.port=${FRONT_MAIN_PORT}"
+      - "traefik.http.routers.${FRONT_MAIN_NAME}.rule=Host(`${BASE_URL}`) && PathPrefix(`/`)"
+      - "traefik.http.services.${FRONT_MAIN_NAME}.loadbalancer.server.port=${FRONT_MAIN_PORT}"
 
 
   elective-web-auth:
@@ -34,8 +34,8 @@ services:
       - NODE_ENV_PROFILE=production
       - NODE_ENV_PREFIX=${BACK_AUTH_PREFIX}
     labels:
-      - "traefik.http.routers.elective-web-auth.rule=Host(`${BASE_URL}`) && PathPrefix(`${BACK_AUTH_PREFIX}`)" # Définir la règle de routage pour l'API
-      - "traefik.http.services.elective-web-auth.loadbalancer.server.port=${BACK_AUTH_PORT}" # Définir le port du service
+      - "traefik.http.routers.${BACK_AUTH_NAME}.rule=Host(`${BASE_URL}`) && PathPrefix(`${BACK_AUTH_PREFIX}`)" # Définir la règle de routage pour l'API
+      - "traefik.http.services.${BACK_AUTH_NAME}.loadbalancer.server.port=${BACK_AUTH_PORT}" # Définir le port du service
 
   elective-web-restauration:
     restart: always
@@ -51,9 +51,9 @@ services:
       - NODE_ENV_PROFILE=production
       - NODE_ENV_PREFIX=${BACK_RESTAURATION_PREFIX}
     labels:
-      - "traefik.http.routers.elective-web-restauration.rule=Host(`${BASE_URL}`) && PathPrefix(`${BACK_RESTAURATION_PREFIX}`)" # Définir la règle de routage pour l'API
-      - "traefik.http.services.elective-web-restauration.loadbalancer.server.port=${BACK_RESTAURATION_PORT}" # Définir le port du service
-      - "traefik.http.routers.elective-web-restauration.middlewares=auth-middleware" # Ajouter le middleware d'authentification
+      - "traefik.http.routers.${BACK_RESTAURATION_NAME}.rule=Host(`${BASE_URL}`) && PathPrefix(`${BACK_RESTAURATION_PREFIX}`)" # Définir la règle de routage pour l'API
+      - "traefik.http.services.${BACK_RESTAURATION_NAME}.loadbalancer.server.port=${BACK_RESTAURATION_PORT}" # Définir le port du service
+      - "traefik.http.routers.${BACK_RESTAURATION_NAME}.middlewares=auth-middleware" # Ajouter le middleware d'authentification
 
   elective-web-order:
     restart: always
@@ -69,9 +69,9 @@ services:
       - NODE_ENV_PROFILE=production
       - NODE_ENV_PREFIX=${BACK_ORDER_PREFIX}
     labels:
-      - "traefik.http.routers.elective-web-order.rule=Host(`${BASE_URL}`) && PathPrefix(`${BACK_ORDER_PREFIX}`)" # Définir la règle de routage pour l'API
-      - "traefik.http.services.elective-web-order.loadbalancer.server.port=${BACK_ORDER_PORT}" # Définir le port du service
-      - "traefik.http.routers.elective-web-order.middlewares=auth-middleware" # Ajouter le middleware d'authentification
+      - "traefik.http.routers.${BACK_ORDER_NAME}.rule=Host(`${BASE_URL}`) && PathPrefix(`${BACK_ORDER_PREFIX}`)" # Définir la règle de routage pour l'API
+      - "traefik.http.services.${BACK_ORDER_NAME}.loadbalancer.server.port=${BACK_ORDER_PORT}" # Définir le port du service
+      - "traefik.http.routers.${BACK_ORDER_NAME}.middlewares=auth-middleware" # Ajouter le middleware d'authentification
 
   mongo:
     restart: always
