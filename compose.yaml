@@ -37,7 +37,7 @@ services:
       - "traefik.http.routers.${BACK_AUTH_NAME}.rule=Host(`${BASE_URL}`) && PathPrefix(`${BACK_AUTH_PREFIX}`)" # Définir la règle de routage pour l'API
       - "traefik.http.services.${BACK_AUTH_NAME}.loadbalancer.server.port=${BACK_AUTH_PORT}" # Définir le port du service
 
-  elective-web-restauration:
+  elective-web-restaurant:
     restart: always
     image: ${NOM_REPO_DOCKERHUB}/${BACK_RESTAURATION_NAME}:${BACK_RESTAURATION_VERSION}
     depends_on:
