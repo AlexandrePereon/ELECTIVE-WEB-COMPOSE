@@ -12,7 +12,7 @@ scrape_configs:
 
   - job_name: 'elective-web-restauration'
     static_configs:
-      - targets: ['elective-web-restauration:3002']
+      - targets: ['elective-web-restaurant:3002']
 
   - job_name: 'elective-web-order'
     static_configs:
