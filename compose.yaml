@@ -1,21 +1,21 @@
 services:
-  elective-web-front:
-    image: ${NOM_REPO_DOCKERHUB}/${FRONT_MAIN_NAME}:${FRONT_MAIN_VERSION}
-    container_name: ${FRONT_MAIN_NAME}
-    stdin_open: true
-    ports:
-      - ${FRONT_MAIN_PORT}
-    restart: always
-    depends_on:
-      - ${BACK_AUTH_NAME}
-      - ${BACK_RESTAURATION_NAME}
-      - ${BACK_ORDER_NAME}
-      - traefik
-    expose:
-      - ${FRONT_MAIN_PORT}
-    labels:
-      - "traefik.http.routers.${FRONT_MAIN_NAME}.rule=Host(`${BASE_URL}`) && PathPrefix(`/`)"
-      - "traefik.http.services.${FRONT_MAIN_NAME}.loadbalancer.server.port=${FRONT_MAIN_PORT}"
+  # elective-web-front:
+  #   image: ${NOM_REPO_DOCKERHUB}/${FRONT_MAIN_NAME}:${FRONT_MAIN_VERSION}
+  #   container_name: ${FRONT_MAIN_NAME}
+  #   stdin_open: true
+  #   ports:
+  #     - ${FRONT_MAIN_PORT}
+  #   restart: always
+  #   depends_on:
+  #     - ${BACK_AUTH_NAME}
+  #     - ${BACK_RESTAURATION_NAME}
+  #     - ${BACK_ORDER_NAME}
+  #     - traefik
+  #   expose:
+  #     - ${FRONT_MAIN_PORT}
+  #   labels:
+  #     - "traefik.http.routers.${FRONT_MAIN_NAME}.rule=Host(`${BASE_URL}`) && PathPrefix(`/`)"
+  #     - "traefik.http.services.${FRONT_MAIN_NAME}.loadbalancer.server.port=${FRONT_MAIN_PORT}"
 
 
   elective-web-auth:
@@ -36,6 +36,7 @@ services:
     labels:
       - "traefik.http.routers.${BACK_AUTH_NAME}.rule=Host(`${BASE_URL}`) && PathPrefix(`${BACK_AUTH_PREFIX}`)" # Définir la règle de routage pour l'API
       - "traefik.http.services.${BACK_AUTH_NAME}.loadbalancer.server.port=${BACK_AUTH_PORT}" # Définir le port du service
+      - "traefik.http.routers.${BACK_AUTH_NAME}.middlewares=auth-middleware"
 
   elective-web-restaurant:
     restart: always
