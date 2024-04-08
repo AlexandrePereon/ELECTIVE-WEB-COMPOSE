@@ -141,6 +141,13 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
     ports:
       - 9090:9090
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prometheus.rule=Host(`${BASE_URL}`) && PathPrefix(`${PROMETHEUS_PREFIX}`)" 
+      - "traefik.http.routers.prometheus.entrypoints=websecure"
+      - "traefik.http.routers.prometheus.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.prometheus-stripprefix.stripprefix.prefixes=/prometheus"
+      - "traefik.http.routers.prometheus.middlewares=prometheus-stripprefix"
 
   grafana:
     image: grafana/grafana
@@ -160,6 +167,8 @@ services:
     labels:
       - "traefik.http.routers.grafana.rule=Host(`${BASE_URL}`) && PathPrefix(`${GRAFANA_PREFIX}`)" 
       - "traefik.http.services.grafana.loadbalancer.server.port=${GRAFANA_PORT}"
+      - "traefik.http.routers.grafana.entrypoints=websecure"
+      - "traefik.http.routers.grafana.tls.certresolver=myresolver"
 
   gitlab:
     image: yrzr/gitlab-ce-arm64v8
