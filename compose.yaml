@@ -39,6 +39,8 @@ services:
       - "traefik.http.routers.${BACK_AUTH_NAME}.rule=Host(`${BASE_URL}`) && PathPrefix(`${BACK_AUTH_PREFIX}`)" # Définir la règle de routage pour l'API
       - "traefik.http.services.${BACK_AUTH_NAME}.loadbalancer.server.port=${BACK_AUTH_PORT}" # Définir le port du service
       - "traefik.http.routers.${BACK_AUTH_NAME}.middlewares=auth-middleware"
+      - "traefik.http.routers.${BACK_AUTH_NAME}.entrypoints=websecure"
+      - "traefik.http.routers.${BACK_AUTH_NAME}.tls.certresolver=myresolver"
 
   elective-web-restaurant:
     restart: always
@@ -57,7 +59,8 @@ services:
       - "traefik.http.routers.${BACK_RESTAURATION_NAME}.rule=Host(`${BASE_URL}`) && PathPrefix(`${BACK_RESTAURATION_PREFIX}`)" # Définir la règle de routage pour l'API
       - "traefik.http.services.${BACK_RESTAURATION_NAME}.loadbalancer.server.port=${BACK_RESTAURATION_PORT}" # Définir le port du service
       - "traefik.http.routers.${BACK_RESTAURATION_NAME}.middlewares=auth-middleware" # Ajouter le middleware d'authentification
-
+      - "traefik.http.routers.${BACK_RESTAURATION_NAME}.entrypoints=websecure"
+      - "traefik.http.routers.${BACK_RESTAURATION_NAME}.tls.certresolver=myresolver"
   elective-web-order:
     restart: always
     image: ${NOM_REPO_DOCKERHUB}/${BACK_ORDER_NAME}:${BACK_ORDER_VERSION}
@@ -75,7 +78,8 @@ services:
       - "traefik.http.routers.${BACK_ORDER_NAME}.rule=Host(`${BASE_URL}`) && PathPrefix(`${BACK_ORDER_PREFIX}`)" # Définir la règle de routage pour l'API
       - "traefik.http.services.${BACK_ORDER_NAME}.loadbalancer.server.port=${BACK_ORDER_PORT}" # Définir le port du service
       - "traefik.http.routers.${BACK_ORDER_NAME}.middlewares=auth-middleware" # Ajouter le middleware d'authentification
-
+      - "traefik.http.routers.${BACK_ORDER_NAME}.entrypoints=websecure"
+      - "traefik.http.routers.${BACK_ORDER_NAME}.tls.certresolver=myresolver"
   mongo:
     restart: always
     image: mongo:${MONGO_VERSION}
@@ -118,6 +122,7 @@ services:
       - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
     ports:
       - "8080:8080"
+      - "80:80"
       - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
