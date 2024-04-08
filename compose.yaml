@@ -16,6 +16,8 @@ services:
     labels:
       - "traefik.http.routers.${FRONT_MAIN_NAME}.rule=Host(`${BASE_URL}`) && PathPrefix(`/`)"
       - "traefik.http.services.${FRONT_MAIN_NAME}.loadbalancer.server.port=${FRONT_MAIN_PORT}"
+      - "traefik.http.routers.${FRONT_MAIN_NAME}.entrypoints=websecure"
+      - "traefik.http.routers.${FRONT_MAIN_NAME}.tls.certresolver=myresolver"
 
 
   elective-web-auth:
@@ -110,11 +112,16 @@ services:
       - --api.insecure=true
       - --providers.docker=true
       - --metrics.prometheus=true
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.myresolver.acme.tlschallenge=true
+      - --certificatesresolvers.myresolver.acme.email=cesieats@email.com
+      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
     ports:
-      - "80:80"
       - "8080:8080"
+      - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./letsencrypt:/letsencrypt
     labels:
       - "traefik.http.middlewares.auth-middleware.forwardauth.address=http://elective-web-auth:3000${BACK_AUTH_PREFIX}/verify" # Définir l'adresse de l'API d'authentification
       - "traefik.http.middlewares.auth-middleware.forwardauth.authResponseHeaders=X-User" # Définir le header à ajouter à la requête
@@ -159,7 +166,7 @@ services:
         gitlab_rails['store_initial_root_password'] = true
         external_url 'http://${BASE_URL}${GITLAB_PREFIX}'
     ports:
-      - ${GITLAB_PORT}:80
+      - ${GITLAB_PORT}:443
     volumes:
       - './data/gitlab/config:/etc/gitlab'
       - './data/gitlab/logs:/var/log/gitlab'
@@ -167,7 +174,7 @@ services:
     shm_size: '256m'
     labels:
     - "traefik.http.routers.gitlab.rule=Host(`${BASE_URL}`) && PathPrefix(`${GITLAB_PREFIX}`)" 
-    - "traefik.http.services.gitlab.loadbalancer.server.port=80"
-    - "traefik.http.routers.gitlab.entrypoints=http"
+    - "traefik.http.services.gitlab.loadbalancer.server.port=443"
+    - "traefik.http.routers.gitlab.entrypoints=websecure"
 
     
