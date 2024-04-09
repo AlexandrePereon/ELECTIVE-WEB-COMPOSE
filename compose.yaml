@@ -32,6 +32,8 @@ services:
       - ${BACK_AUTH_PORT}
     expose: 
       - ${BACK_AUTH_PORT}
+    volumes:
+      - ./logs:/usr/src/app/logs
     environment:
       - NODE_ENV_PROFILE=production
       - NODE_ENV_PREFIX=${BACK_AUTH_PREFIX}
