@@ -90,6 +90,7 @@ services:
       - "${MONGO_DB_PORT}:${MONGO_DB_PORT}"
     volumes:
       - ./data/mongodb_data:/data/db
+      - ./mongodb_script/init-mongo.js:/docker-entrypoint-initdb.d 
     expose:
       - ${MONGO_DB_PORT}
     depends_on:
@@ -178,9 +179,9 @@ services:
     restart: always
     environment:
       GITLAB_OMNIBUS_CONFIG: |
-        gitlab_rails['initial_root_password'] = "ComplexPassword123"
+        gitlab_rails['initial_root_password'] = ${GITLAB_ROOT_PASSWORD}
         gitlab_rails['store_initial_root_password'] = true
-        external_url 'https://${BASE_URL}${GITLAB_PREFIX}'
+        external_url 'http://${BASE_URL}${GITLAB_PREFIX}'
     ports:
       - ${GITLAB_PORT}:443
     volumes:
@@ -193,7 +194,7 @@ services:
     - "traefik.http.routers.gitlab.entrypoints=websecure"
     - "traefik.http.routers.gitlab.tls=true"  # Activer TLS
     - "traefik.http.routers.gitlab.tls.certresolver=myresolver"
-    - "traefik.http.services.gitlab.loadbalancer.server.port=443"
+    - "traefik.http.services.gitlab.loadbalancer.server.port=80"
 
 
 
