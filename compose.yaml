@@ -88,7 +88,6 @@ services:
     container_name: mongo
     volumes:
       - ./data/mongodb_data:/data/db
-      - ./mongodb_script/init-mongo.js:/docker-entrypoint-initdb.d 
     expose:
       - ${MONGO_DB_PORT} 
     
