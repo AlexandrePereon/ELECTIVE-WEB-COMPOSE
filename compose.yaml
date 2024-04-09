@@ -192,6 +192,9 @@ services:
     - "traefik.http.routers.gitlab.rule=Host(`${BASE_URL}`) && PathPrefix(`${GITLAB_PREFIX}`)" 
     - "traefik.http.routers.gitlab.entrypoints=websecure"
     - "traefik.http.routers.gitlab.tls.certresolver=myresolver"
+    - "traefik.http.services.gitlab.loadbalancer.server.port=80"
+
+
 
 
     
