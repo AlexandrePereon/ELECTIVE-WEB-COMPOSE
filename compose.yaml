@@ -190,7 +190,8 @@ services:
     shm_size: '256m'
     labels:
     - "traefik.http.routers.gitlab.rule=Host(`${BASE_URL}`) && PathPrefix(`${GITLAB_PREFIX}`)" 
-    - "traefik.http.services.gitlab.loadbalancer.server.port=443"
     - "traefik.http.routers.gitlab.entrypoints=websecure"
+    - "traefik.http.routers.gitlab.tls.certresolver=myresolver"
+
 
     
