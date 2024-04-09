@@ -1,21 +1,21 @@
 services:
-  # elective-web-front:
-  #   image: ${NOM_REPO_DOCKERHUB}/${FRONT_MAIN_NAME}:${FRONT_MAIN_VERSION}
-  #   container_name: ${FRONT_MAIN_NAME}
-  #   stdin_open: true
-  #   ports:
-  #     - ${FRONT_MAIN_PORT}
-  #   restart: always
-  #   depends_on:
-  #     - ${BACK_AUTH_NAME}
-  #     - ${BACK_RESTAURATION_NAME}
-  #     - ${BACK_ORDER_NAME}
-  #     - traefik
-  #   expose:
-  #     - ${FRONT_MAIN_PORT}
-  #   labels:
-  #     - "traefik.http.routers.${FRONT_MAIN_NAME}.rule=Host(`${BASE_URL}`) && PathPrefix(`/`)"
-  #     - "traefik.http.services.${FRONT_MAIN_NAME}.loadbalancer.server.port=${FRONT_MAIN_PORT}"
+  elective-web-front:
+    image: ${NOM_REPO_DOCKERHUB}/${FRONT_MAIN_NAME}:${FRONT_MAIN_VERSION}
+    container_name: ${FRONT_MAIN_NAME}
+    stdin_open: true
+    ports:
+      - ${FRONT_MAIN_PORT}
+    restart: always
+    depends_on:
+      - ${BACK_AUTH_NAME}
+      - ${BACK_RESTAURATION_NAME}
+      - ${BACK_ORDER_NAME}
+      - traefik
+    expose:
+      - ${FRONT_MAIN_PORT}
+    labels:
+      - "traefik.http.routers.${FRONT_MAIN_NAME}.rule=Host(`${BASE_URL}`) && PathPrefix(`/`)"
+      - "traefik.http.services.${FRONT_MAIN_NAME}.loadbalancer.server.port=${FRONT_MAIN_PORT}"
 
 
   elective-web-auth:
@@ -30,6 +30,8 @@ services:
       - ${BACK_AUTH_PORT}
     expose: 
       - ${BACK_AUTH_PORT}
+    volumes:
+      - ./logs:/usr/src/app/logs
     environment:
       - NODE_ENV_PROFILE=production
       - NODE_ENV_PREFIX=${BACK_AUTH_PREFIX}
@@ -145,25 +147,25 @@ services:
       - "traefik.http.routers.grafana.rule=Host(`${BASE_URL}`) && PathPrefix(`${GRAFANA_PREFIX}`)" 
       - "traefik.http.services.grafana.loadbalancer.server.port=${GRAFANA_PORT}"
 
-  gitlab:
-    image: gitlab/gitlab-ee:${GITLAB_VERSION}
-    container_name: gitlab
-    restart: always
-    environment:
-      GITLAB_OMNIBUS_CONFIG: |
-        gitlab_rails['initial_root_password'] = "ComplexPassword123"
-        gitlab_rails['store_initial_root_password'] = true
-        external_url 'http://${BASE_URL}${GITLAB_PREFIX}'
-    ports:
-      - ${GITLAB_PORT}:80
-    volumes:
-      - './data/gitlab/config:/etc/gitlab'
-      - './data/gitlab/logs:/var/log/gitlab'
-      - './data/gitlab/data:/var/opt/gitlab'
-    shm_size: '256m'
-    labels:
-    - "traefik.http.routers.gitlab.rule=Host(`${BASE_URL}`) && PathPrefix(`${GITLAB_PREFIX}`)" 
-    - "traefik.http.services.gitlab.loadbalancer.server.port=80"
-    - "traefik.http.routers.gitlab.entrypoints=http"
+  # gitlab:
+  #   image: gitlab/gitlab-ee:${GITLAB_VERSION}
+  #   container_name: gitlab
+  #   restart: always
+  #   environment:
+  #     GITLAB_OMNIBUS_CONFIG: |
+  #       gitlab_rails['initial_root_password'] = "ComplexPassword123"
+  #       gitlab_rails['store_initial_root_password'] = true
+  #       external_url 'http://${BASE_URL}${GITLAB_PREFIX}'
+  #   ports:
+  #     - ${GITLAB_PORT}:80
+  #   volumes:
+  #     - './data/gitlab/config:/etc/gitlab'
+  #     - './data/gitlab/logs:/var/log/gitlab'
+  #     - './data/gitlab/data:/var/opt/gitlab'
+  #   shm_size: '256m'
+  #   labels:
+  #   - "traefik.http.routers.gitlab.rule=Host(`${BASE_URL}`) && PathPrefix(`${GITLAB_PREFIX}`)" 
+  #   - "traefik.http.services.gitlab.loadbalancer.server.port=80"
+  #   - "traefik.http.routers.gitlab.entrypoints=http"
 
     
