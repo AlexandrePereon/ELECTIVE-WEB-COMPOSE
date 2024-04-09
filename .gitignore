@@ -3,3 +3,4 @@ mongodb_data
 mysql_data
 grafana_data
 logs/
+letsencrypt
