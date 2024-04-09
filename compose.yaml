@@ -101,7 +101,7 @@ services:
     platform: linux/arm64
     command: --init-file /docker-entrypoint-initdb.d/init.sql
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${{secrets.MYSQL_ROOT_PASSWORD}}
     ports:
       - "${MY_SQL_PORT}:${MY_SQL_PORT}"
     volumes:
