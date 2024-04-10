@@ -127,7 +127,9 @@ services:
       - "traefik.http.middlewares.auth-middleware.forwardauth.address=http://elective-web-auth:3000${BACK_AUTH_PREFIX}/verify" # Définir l'adresse de l'API d'authentification
       - "traefik.http.middlewares.auth-middleware.forwardauth.authResponseHeaders=X-User" # Définir le header à ajouter à la requête
       - "traefik.http.middlewares.auth-middleware.forwardauth.trustForwardHeader=true" # Si vous faites confiance au header X-Forwarded-For
-  
+ 
+
+
   prometheus:
     image: prom/prometheus
     platform: linux/arm64/v8
@@ -135,8 +137,8 @@ services:
       - ./metrics/prometheus.yml:/etc/prometheus/prometheus.yml
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
-    ports:
-      - 9090:9090
+    expose:
+      - 9090
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.prometheus.rule=Host(`${BASE_URL}`) && PathPrefix(`${PROMETHEUS_PREFIX}`)" 
