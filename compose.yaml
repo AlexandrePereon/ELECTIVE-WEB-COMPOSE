@@ -135,8 +135,8 @@ services:
       - ./metrics/prometheus.yml:/etc/prometheus/prometheus.yml
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
-    ports:
-      - 9090:9090
+    expose:
+      - 9090
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.prometheus.rule=Host(`${BASE_URL}`) && PathPrefix(`${PROMETHEUS_PREFIX}`)" 
