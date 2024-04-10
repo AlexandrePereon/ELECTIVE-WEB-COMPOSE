@@ -128,6 +128,8 @@ services:
       - "traefik.http.middlewares.auth-middleware.forwardauth.authResponseHeaders=X-User" # Définir le header à ajouter à la requête
       - "traefik.http.middlewares.auth-middleware.forwardauth.trustForwardHeader=true" # Si vous faites confiance au header X-Forwarded-For
       - "traefik.http.routers.traefik.rule=Host(`${BASE_URL}`) && PathPrefix(`/dashboard`)" 
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080" # 
+
 
   prometheus:
     image: prom/prometheus
