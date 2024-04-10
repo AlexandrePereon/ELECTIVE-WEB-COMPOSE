@@ -131,10 +131,7 @@ services:
       - "traefik.http.routers.traefik_https.entrypoints=websecure"
       - "traefik.http.routers.traefik_https.tls=true"
       - "traefik.http.routers.traefik_https.tls.certresolver=myresolver"
-
-     
-
-  traefik.http.routers.traefik_https.service: api@internal
+      - "traefik.http.routers.traefik_https.service: api@internal"
 
 
   prometheus:
