@@ -127,11 +127,6 @@ services:
       - "traefik.http.middlewares.auth-middleware.forwardauth.address=http://elective-web-auth:3000${BACK_AUTH_PREFIX}/verify" # Définir l'adresse de l'API d'authentification
       - "traefik.http.middlewares.auth-middleware.forwardauth.authResponseHeaders=X-User" # Définir le header à ajouter à la requête
       - "traefik.http.middlewares.auth-middleware.forwardauth.trustForwardHeader=true" # Si vous faites confiance au header X-Forwarded-For
-      - "traefik.http.routers.traefik_https.rule=Host(`${BASE_URL}`) && PathPrefix(`/dashboard`)"
-      - "traefik.http.routers.traefik_https.entrypoints=websecure"
-      - "traefik.http.routers.traefik_https.tls=true"
-      - "traefik.http.routers.traefik_https.tls.certresolver=myresolver"
-      - "traefik.http.routers.traefik_https.service: api@internal"
 
 
   prometheus:
